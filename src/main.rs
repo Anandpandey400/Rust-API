@@ -1,8 +1,9 @@
-use axum::Router;
+use axum::{Router, middleware as axum_middleware};
 use std::net::SocketAddr;
 
 mod controllers;
 mod db;
+mod middleware;
 mod models;
 mod routes;
 
@@ -13,6 +14,7 @@ async fn main() {
 
     let app = Router::new()
         .nest("/", routes::api::api_routes())
+        .layer(axum_middleware::from_fn(middleware::logger::log_requests))
         .with_state(pool);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
